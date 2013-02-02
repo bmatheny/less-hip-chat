@@ -7,8 +7,11 @@ object ApplicationBuild extends Build {
   val appName         = "less-hip-chat"
   val appVersion      = "1.0-SNAPSHOT"
 
+  val camelVersion = "2.10.3"
+
   val appDependencies = Seq(
-    // Add your project dependencies here,
+    "org.apache.camel" % "camel-solr" % camelVersion,
+    "org.apache.camel" % "camel-irc"  % camelVersion
   )
 
 

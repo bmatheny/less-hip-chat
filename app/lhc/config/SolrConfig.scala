@@ -18,6 +18,9 @@ case class SolrConfig(override val underlying: Configuration) extends ConfigAcce
       if (isEmbedded) {
         validateWritable(home.get)
         logger.info("Using embedded solr with home %s".format(home.get.getAbsolutePath))
+      } else {
+        // FIXME validateReachable
+        logger.info("Using remote solr instance %s".format(url.get))
       }
     }
   }

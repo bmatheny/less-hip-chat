@@ -12,6 +12,11 @@ fairly self documenting.
 Each channel specified in the configuration can also get a specified purge time,
 where messages older than a particular time can be purged.
 
+Additionally, some values can be specified via a system property:
+
+  * `-Dsolr.home=/tmp/solr` - A directory for solr to write data to, if using the embedded server
+  * `-Dsolr.url=http://host:port` - A URL to use for a remote solr instance
+
 ## Building
 
 Just use the pre-built jar. Or, feel free to built with sbt.
