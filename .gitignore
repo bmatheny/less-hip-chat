@@ -1,6 +1,9 @@
 *.class
 *.log
 
+# solr specific
+data/solr/*
+
 # sbt specific
 dist/*
 target/
