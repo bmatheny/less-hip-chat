@@ -1,7 +1,22 @@
-@(message: String)
+@import lhc.config.AppConfig
 
-@main("Welcome to Play 2.1") {
-    
-    @play20.welcome(message)
-    
+@main("Less Hip Chat Configuration") {
+  <table>
+    <thead>
+      <tr>
+        <th>Channel</th>
+        <th>Password</th>
+        <th>Expiration</th>
+      </tr>
+    </thead>
+    <tbody>
+      @AppConfig.irc.channels.map { chan =>
+      <tr>
+        <td>@chan.name</td>
+        <td>@chan.password.getOrElse("None")</td>
+        <td>@chan.expireAfter.map(_.toString).getOrElse("Never")</td>
+      </tr>
+      }
+    </tbody>
+  </table>
 }

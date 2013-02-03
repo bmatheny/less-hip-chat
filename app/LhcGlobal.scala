@@ -1,4 +1,5 @@
 import lhc.config.AppConfig
+import lhc.consumers.IrcConsumer
 
 import play.api.{Application, Configuration, GlobalSettings, Mode}
 import java.io.File
@@ -11,4 +12,5 @@ object LhcGlobal extends GlobalSettings {
     AppConfig.config = super.onLoadConfig(config, path, classloader, mode)
     AppConfig.config
   }
+
 }

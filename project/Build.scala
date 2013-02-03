@@ -10,13 +10,12 @@ object ApplicationBuild extends Build {
   val camelVersion = "2.10.3"
 
   val appDependencies = Seq(
-    "org.apache.camel" % "camel-solr" % camelVersion,
-    "org.apache.camel" % "camel-irc"  % camelVersion
+    "org.pircbotx" % "pircbotx" % "1.8"
   )
 
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+    resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
   )
 
 }
