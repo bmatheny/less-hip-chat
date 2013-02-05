@@ -1,6 +1,17 @@
+@(groups: Set[String], results: Seq[org.apache.solr.common.SolrDocument])
+
+@import java.util.ArrayList
 @import lhc.config.AppConfig
+@import org.apache.solr.common.SolrDocument
 
 @main("Less Hip Chat Configuration") {
+@groups.map { res =>
+@res.toString() <br/>
+}
+@results.map { res =>
+@res.toString() <br/>
+}
+
   <table>
     <thead>
       <tr>

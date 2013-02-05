@@ -10,7 +10,9 @@ object ApplicationBuild extends Build {
   val camelVersion = "2.10.3"
 
   val appDependencies = Seq(
-    "org.pircbotx" % "pircbotx" % "1.8"
+    "org.pircbotx"      % "pircbotx"    % "1.8",
+    "org.apache.solr"   % "solr-core"   % "3.6.1",
+    "javax.servlet"     % "servlet-api" % "2.5"
   )
 
 

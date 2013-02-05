@@ -2,7 +2,7 @@
 *.log
 
 # solr specific
-data/solr/*
+#solr/data/*
 
 # sbt specific
 dist/*

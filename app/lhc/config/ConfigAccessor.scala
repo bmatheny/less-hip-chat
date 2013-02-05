@@ -17,6 +17,7 @@ trait ConfigAccessor extends LhcLogger {
     getBoolean(path).getOrElse(default)
 
   def getInt(path: String): Option[Int] = underlying.getInt(mkPath(path))
+  def getMillis(path: String): Option[Long] = underlying.getMilliseconds(mkPath(path))
   def getObject(path: String): Option[ConfigObject] = underlying.getObject(mkPath(path))
   def getObjectList(path: String): Option[java.util.List[_ <: ConfigObject]] =
     underlying.getObjectList(mkPath(path))
