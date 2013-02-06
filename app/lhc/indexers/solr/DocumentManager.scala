@@ -5,14 +5,13 @@ import lhc.util.DefaultLhcLogger
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 import scala.collection.JavaConverters._
 import java.util.concurrent.BlockingQueue
-import java.util.{ArrayList, Collection, Date, UUID}
+import java.util.{ArrayList, Collection, Date}
 
 object DocumentManager extends DefaultLhcLogger {
 
   def convert(message: Message): SolrInputDocument = {
     val doc = new SolrInputDocument()
-    doc.addField("uuid", UUID.randomUUID().toString())
-    doc.addField("id", message.getId.toInt)
+    doc.addField("uuid", message.getUuid)
     doc.addField("timestamp", message.iso8601)
     doc.addField("group", message.getGroup)
     doc.addField("message", message.getMessage)
@@ -29,7 +28,7 @@ object DocumentManager extends DefaultLhcLogger {
       ukey -> doc.getFirstValue(key).asInstanceOf[String]
     }.toMap[String,String]
     BasicMessage.createMessage(
-      id = doc.getFieldValue("id").asInstanceOf[Int].toLong,
+      uuid = doc.getFieldValue("uuid").asInstanceOf[String],
       timestamp = doc.getFieldValue("timestamp").asInstanceOf[Date].getTime,
       group = doc.getFieldValue("group").asInstanceOf[String],
       message = doc.getFieldValue("message").asInstanceOf[String],

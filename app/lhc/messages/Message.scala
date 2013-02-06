@@ -5,7 +5,7 @@ import java.util.{Date, TimeZone}
 import org.joda.time.format.ISODateTimeFormat
 
 trait Message {
-  def getId(): Long
+  def getUuid(): String
   def getTimestamp(): Long
   def getGroup(): String
   def getUser(): Map[String,String]

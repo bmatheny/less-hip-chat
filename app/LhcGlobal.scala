@@ -12,5 +12,15 @@ object LhcGlobal extends GlobalSettings {
     AppConfig.config = super.onLoadConfig(config, path, classloader, mode)
     AppConfig.config
   }
+  
+  override def beforeStart(app: Application) {
+    System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+    System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
+    System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "WARN");
+    System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.wire", "WARN");
+    System.setProperty("org.apache.commons.logging.simplelog.http.wire", "WARN");
+    System.setProperty("org.apache.commons.logging.simplelog.http.wire.content", "WARN");
+    System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.commons.httpclient", "WARN");
+  }
 
 }

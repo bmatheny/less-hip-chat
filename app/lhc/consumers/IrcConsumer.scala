@@ -5,6 +5,7 @@ import lhc.indexers.Indexer
 import lhc.messages.IrcMessage
 import lhc.util.LhcLogger
 
+import java.util.UUID
 import scala.util.control.NonFatal
 
 import org.pircbotx.{Colors, PircBotX, UtilSSLSocketFactory}
@@ -60,7 +61,8 @@ class IrcConsumer(val cfg: IrcConfig, val indexer: Indexer) extends ListenerAdap
     val userMap = Map(
       "login" -> user.getLogin, "nick" -> user.getNick, "realName" -> user.getRealName
     )
-    val ircMessage = IrcMessage(event.getId, event.getTimestamp, channel.getName, userMap, msg)
+    val uuid = UUID.randomUUID().toString()
+    val ircMessage = IrcMessage(uuid, event.getTimestamp, channel.getName, userMap, msg)
     logger.debug("Indexing message: %s".format(ircMessage))
     indexer.index(ircMessage)
   }
