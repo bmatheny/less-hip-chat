@@ -6,8 +6,7 @@ support that kind of functionality, using Solr.
 
 ## Configuration
 
-I'm not a huge XML fan, I just use a little properties file. This should be
-fairly self documenting.
+Check out conf/application.conf. This should be fairly self documenting.
 
 Each channel specified in the configuration can also get a specified purge time,
 where messages older than a particular time can be purged.
@@ -25,6 +24,22 @@ Just use the pre-built jar. Or, feel free to built with sbt.
 
 run `java -Dconfig.file=config.properties -jar lesshipchat.jar`. Or run it via
 daemon so it goes into the background and leaves you alone.
+
+## Search API
+
+There is a pretty basic search API that provides JSON and JSONP output.
+
+### URL
+
+    GET /search
+
+### Parameters
+
+  * `callback` - string 
+  * `query` - string
+  * `size` - int
+  * `page` - int
+  * `sort` - string - asc or desc - defaults to desc
 
 ## Disclaimer
 
