@@ -17,7 +17,8 @@ object ApplicationBuild extends Build {
 
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
+    resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public",
+    scalacOptions ++= Seq("-feature")
   )
 
 }

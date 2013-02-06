@@ -2,8 +2,9 @@ package lhc.plugins
 
 import lhc.config.AppConfig
 import lhc.consumers.IrcConsumer
-import lhc.indexers.SolrIndexer
-import lhc.util.LhcLogger
+import lhc.indexers.{Indexer, SolrIndexer, Sort}
+import lhc.messages.Message
+import lhc.util.{DefaultLhcLogger, LhcLogger}
 import play.api.{Application, Plugin}
 import org.pircbotx.PircBotX
 
@@ -11,8 +12,7 @@ class IndexPlugin(app: Application) extends Plugin with LhcLogger {
   override val loggerName: String = "index-plugin"
 
   private var consumer: Option[IrcConsumer] = None
-  //private var indexer: Option[SolrIndexer] = None
-  var indexer: Option[SolrIndexer] = None
+  private var indexer: Option[Indexer] = None
 
   override def onStart() {
     logger.info("Starting IndexPlugin")
@@ -25,6 +25,16 @@ class IndexPlugin(app: Application) extends Plugin with LhcLogger {
     consumer = Some(new IrcConsumer(AppConfig.irc, idx))
   }
 
+  def find(query: String, rows: Int = 10, start: Int = 0, sort: Sort = Sort.Desc): Seq[Message] = {
+    indexer.map(_.find(query,rows,start,sort)).getOrElse(Seq())
+  }
+  def getGroups(): Set[String] = {
+    indexer.map(_.getGroups).getOrElse(Set())
+  }
+  def getRecent(rows: Int = 10): Seq[Message] = {
+    indexer.map(_.getRecent(rows)).getOrElse(Seq())
+  }
+
   override def onStop() {
     logger.info("Shutting down IndexPlugin")
     consumer.foreach(_.shutdown)
@@ -32,54 +42,31 @@ class IndexPlugin(app: Application) extends Plugin with LhcLogger {
   }
 }
 
-import org.apache.solr.client.solrj.SolrQuery
-import lhc.util.DefaultLhcLogger
-import scala.collection.JavaConverters._
-import org.apache.solr.client.solrj.response.FacetField
-import scala.util.control.NonFatal
 object IndexPlugin extends DefaultLhcLogger {
-  def getGroups(app: Application): Set[String] = {
-    val id = app.plugin[IndexPlugin].get.indexer.get.solrInstance
-    val sq = new SolrQuery().setQuery("*:*").setFacet(true).addFacetField("group")
-                  .setRows(0)
-    try {
-      val rsp = id.query(sq)
-      println(rsp.getFacetQuery())
-      val field = rsp.getFacetField("group")
-      if (field == null) {
-        return Set()
-      }
-      val fields = field.getValues
-      if (fields == null || fields.size == 0) {
-        return Set()
-      }
-      fields.asScala.map { f =>
-        logger.info("Group %s has %d docs".format(f.getName, f.getCount))
-        f.getName
-      }.toSet
-    } catch {
-      case NonFatal(e) =>
-        logger.error("Error running query", e)
-        throw e
+
+  def withPlugin[T](app: Application, default: T)(f: Indexer => T): T = {
+    app.plugin[IndexPlugin].flatMap(_.indexer).map(p => f(p)).getOrElse {
+      logger.error("IndexPlugin not configured")
+      default
     }
   }
 
-  def query(app: Application) = {
-    val id = app.plugin[IndexPlugin].get.indexer.get.solrInstance
-    //val sq = new SolrQuery().setQuery("message:hello AND group:#test")
-    val sq = new SolrQuery().setQuery("*:*").setFacet(true).addFacetField("group")
-                  .setRows(0)
-    try {
-      val rsp = id.query(sq)
-      println(rsp.getFacetFields())
-      val results = rsp.getResults()
-      val sResults = results.asScala
-      logger.info("Found %d results".format(sResults.size))
-      sResults
-    } catch {
-      case NonFatal(e) =>
-        logger.error("Error running query", e)
-        throw e
+  def find(app: Application, query: String, rows: Int = 10, start: Int = 10, sort: Sort = Sort.Desc): Seq[Message] = {
+    withPlugin[Seq[Message]](app, Seq()) { indexer =>
+      indexer.find(query,rows,start,sort)
     }
   }
+
+  def getGroups(app: Application): Set[String] = {
+    withPlugin[Set[String]](app, Set()) { indexer =>
+      indexer.getGroups
+    }
+  }
+
+  def getRecent(app: Application, rows: Int = 10): Seq[Message] = {
+    withPlugin[Seq[Message]](app, Seq()) { indexer =>
+      indexer.getRecent(rows)
+    }
+  }
+
 }

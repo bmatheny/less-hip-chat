@@ -1,4 +1,4 @@
-@(groups: Set[String], results: Seq[org.apache.solr.common.SolrDocument])
+@(groups: Set[String], results: Seq[lhc.messages.Message])
 
 @import java.util.ArrayList
 @import lhc.config.AppConfig
@@ -8,9 +8,26 @@
 @groups.map { res =>
 @res.toString() <br/>
 }
-@results.map { res =>
-@res.toString() <br/>
-}
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Channel</th>
+      <th>Time</th>
+      <th>Message</th>
+    </tr>
+  </thead>
+  <tbody>
+    @results.map { res =>
+    <tr>
+      <td>@res.getUser.get("login").getOrElse("unknown")</td>
+      <td>@res.getGroup</td>
+      <td>@res.iso8601</td>
+      <td>@res.getMessage</td>
+    </tr>
+    }
+  </tbody>
+</table>
 
   <table>
     <thead>

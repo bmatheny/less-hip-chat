@@ -7,7 +7,7 @@ import lhc.util.LhcLogger
 
 import scala.util.control.NonFatal
 
-import org.pircbotx.{PircBotX, UtilSSLSocketFactory}
+import org.pircbotx.{Colors, PircBotX, UtilSSLSocketFactory}
 import org.pircbotx.hooks.ListenerAdapter
 import org.pircbotx.hooks.events._
 
@@ -28,8 +28,8 @@ class IrcConsumer(val cfg: IrcConfig, val indexer: Indexer) extends ListenerAdap
       logger.info("Joining channel %s, password %s".format(
         channel.name, channel.password.map(_ => "*****").getOrElse("unspecified")
       ))
-      if (channel.password.isDefined) bot.joinChannel(channel.name, channel.password.get)
-      else bot.joinChannel(channel.name)
+      if (channel.password.isDefined) safely(_.joinChannel(channel.name, channel.password.get))
+      else safely(_.joinChannel(channel.name))
     }
   }
 
@@ -75,7 +75,8 @@ class IrcConsumer(val cfg: IrcConfig, val indexer: Indexer) extends ListenerAdap
 
   def shutdown() {
     inShutdown = true
-    bot.shutdown(true);
+    // FIXME this throws an exception for some reason :/
+    safely(_.shutdown(true))
   }
 
   protected def tryReconnect(attempt: Int, event: DisconnectEvent[PircBotX]): Boolean = {
@@ -90,6 +91,15 @@ class IrcConsumer(val cfg: IrcConfig, val indexer: Indexer) extends ListenerAdap
         ))
         Thread.sleep(10 * 1000)
         false
+    }
+  }
+  protected def safely[T](f: PircBotX => T): Option[T] = {
+    try {
+      Option(f(bot))
+    } catch {
+      case NonFatal(e) =>
+        logger.warn("IRC operation failed: %s".format(e.getMessage), e)
+        None
     }
   }
 }
