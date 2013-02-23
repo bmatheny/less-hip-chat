@@ -31,7 +31,10 @@ object Application extends Controller {
   }
 
   def index = Action {
-    Ok(views.html.index(IndexPlugin.getGroups(current), Seq()))
+    val groups = IndexPlugin.getGroups(current).toSeq.sortWith((a, b) =>
+      a.name.toUpperCase < b.name.toUpperCase
+    )
+    Ok(views.html.index(groups, Seq()))
   }
  
   def search(query: Option[String], size: Option[Int], page: Option[Int], sort: Option[String]) =
