@@ -35,4 +35,5 @@ object formats {
       "message" -> m.getMessage
     )
   }
+
 }

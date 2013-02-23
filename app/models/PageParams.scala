@@ -27,5 +27,8 @@ object PageParams {
   def apply(page: Int, size: Int, sort: String, sortBy: Option[String]): PageParams =
     PageParamsImpl(page, size, SortDirection.withName(sort).getOrElse(SortDirection.Desc), sortBy)
 
+  def apply(page: Int, size: Int, sort: SortDirection): PageParams =
+    PageParamsImpl(page, size, sort, None)
+
   def empty = PageParamsImpl(0, 0, SortDirection.Desc, None)
 }

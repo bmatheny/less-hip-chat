@@ -18,5 +18,8 @@ case class PageImpl[+A](
 ) extends Page[A]
 
 object Page {
+  def apply[A](items: Seq[A], params: PageParams, total: Long) =
+    PageImpl(items, params, total)
+
   def empty[A] = PageImpl[A](Nil, PageParams.empty, 0L)
 }
