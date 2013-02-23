@@ -1,5 +1,8 @@
 package models
 
+import play.api.libs.json._
+import play.api.libs._
+
 trait Page[+A] {
   def items: Seq[A]
   def params: PageParams
@@ -11,6 +14,16 @@ trait Page[+A] {
               .getOrElse(params.page)
 
   lazy val size = items.size
+
+  def toJson(implicit tjs: Writes[Seq[A]]): JsValue = Json.obj(
+    "page" -> Json.obj(
+      "prev" -> prev,
+      "current" -> params.page,
+      "next" -> next,
+      "total" -> total
+    ),
+    "items" -> Json.toJson(items)(tjs)
+  )
 }
 
 case class PageImpl[+A](

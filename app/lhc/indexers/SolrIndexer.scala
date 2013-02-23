@@ -3,7 +3,7 @@ package lhc.indexers
 import lhc.config.SolrConfig
 import lhc.indexers.solr._
 import lhc.util.DefaultLhcLogger
-import models.{Group, Message, SortDirection}
+import models.{Group, Message, Page, PageParams, SortDirection}
 import play.api.Application
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits._
@@ -31,15 +31,16 @@ class SolrIndexer(val cfg: SolrConfig, val app: Application) extends Indexer wit
     }
   )
 
-  override def find(
-    query: String, rows: Int = 10, start: Int = 10, sort: SortDirection = SortDirection.Desc
-  ): Seq[Message] = {
-    val sq = SolrIndexer.findQuery(query, rows, start, sort)
+  override def find(query: String, pageParams: PageParams): Page[Message] = {
+    val sq = SolrIndexer.findQuery(query, pageParams)
     withQueryResponse(sq) { response =>
-      response.getResults.asScala.map { res =>
+      val results = response.getResults
+      val total = results.getNumFound
+      val messages = results.asScala.map { res =>
         DocumentManager.convert(res)
       }
-    }.getOrElse(Seq())
+      Page(messages, pageParams, total)
+    }.getOrElse(Page.empty[Message])
   }
 
   override def getGroups(): Set[Group] = {
@@ -107,8 +108,8 @@ class SolrIndexer(val cfg: SolrConfig, val app: Application) extends Indexer wit
 
 object SolrIndexer {
 
-  def findQuery(q: String, rows: Int, start: Int, sort: SortDirection): SolrQuery = {
-    val ssort = sort match {
+  def findQuery(q: String, pageParams: PageParams): SolrQuery = {
+    val ssort = pageParams.sort match {
       case SortDirection.Desc => SolrQuery.ORDER.desc
       case SortDirection.Asc  => SolrQuery.ORDER.asc
     }
@@ -116,8 +117,8 @@ object SolrIndexer {
     new SolrQuery()
           .setQuery(query)
           .addSortField("timestamp", ssort)
-          .setRows(rows)
-          .setStart(start)
+          .setRows(pageParams.size)
+          .setStart(pageParams.offset)
   }
 
   def groupsQuery(): SolrQuery = {
