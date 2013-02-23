@@ -1,7 +1,8 @@
 package lhc.indexers.solr
 
-import lhc.messages.{BasicMessage, Message}
+import lhc.messages.BasicMessage
 import lhc.util.DefaultLhcLogger
+import models.Message
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 import scala.collection.JavaConverters._
 import java.util.concurrent.BlockingQueue

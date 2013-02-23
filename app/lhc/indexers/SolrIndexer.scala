@@ -2,8 +2,8 @@ package lhc.indexers
 
 import lhc.config.SolrConfig
 import lhc.indexers.solr._
-import lhc.messages.Message
 import lhc.util.DefaultLhcLogger
+import models.{BasicGroup, Group, Message}
 import play.api.Application
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits._
@@ -42,18 +42,17 @@ class SolrIndexer(val cfg: SolrConfig, val app: Application) extends Indexer wit
     }.getOrElse(Seq())
   }
 
-  override def getGroups(): Set[String] = {
+  override def getGroups(): Set[Group] = {
     val sq = SolrIndexer.groupsQuery()
     withQueryResponse(sq) { rsp =>
       Option(rsp.getFacetField("group")).map(_.getValues)
         .filter(l => l != null && l.size > 0) // getValues returns null on no results
         .map { fields =>
           fields.asScala.map { f =>
-            logger.info("Group %s has %d docs".format(f.getName, f.getCount))
-            f.getName
-          }.toSet
-        }.getOrElse(Set())
-    }.getOrElse(Set())
+            BasicGroup(f.getName, f.getCount)
+          }.toSet[Group]
+        }.getOrElse(Set[Group]())
+    }.getOrElse(Set[Group]())
   }
 
   override def getRecent(rows: Int = 10): Seq[Message] = {

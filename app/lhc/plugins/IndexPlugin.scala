@@ -3,8 +3,8 @@ package lhc.plugins
 import lhc.config.AppConfig
 import lhc.consumers.IrcConsumer
 import lhc.indexers.{Indexer, SolrIndexer, Sort}
-import lhc.messages.Message
 import lhc.util.{DefaultLhcLogger, LhcLogger}
+import models.{Group, Message}
 import play.api.{Application, Plugin}
 import org.pircbotx.PircBotX
 
@@ -28,8 +28,8 @@ class IndexPlugin(app: Application) extends Plugin with LhcLogger {
   def find(query: String, rows: Int = 10, start: Int = 0, sort: Sort = Sort.Desc): Seq[Message] = {
     indexer.map(_.find(query,rows,start,sort)).getOrElse(Seq())
   }
-  def getGroups(): Set[String] = {
-    indexer.map(_.getGroups).getOrElse(Set())
+  def getGroups(): Set[Group] = {
+    indexer.map(_.getGroups).getOrElse(Set[Group]())
   }
   def getRecent(rows: Int = 10): Seq[Message] = {
     indexer.map(_.getRecent(rows)).getOrElse(Seq())
@@ -57,8 +57,8 @@ object IndexPlugin extends DefaultLhcLogger {
     }
   }
 
-  def getGroups(app: Application): Set[String] = {
-    withPlugin[Set[String]](app, Set()) { indexer =>
+  def getGroups(app: Application): Set[Group] = {
+    withPlugin[Set[Group]](app, Set[Group]()) { indexer =>
       indexer.getGroups
     }
   }

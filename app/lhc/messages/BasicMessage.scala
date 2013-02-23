@@ -1,5 +1,7 @@
 package lhc.messages
 
+import models.Message
+
 abstract class BasicMessage(
   uuid: String, timestamp: Long, group: String, user: Map[String,String], message: String
 ) extends Message {

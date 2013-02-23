@@ -71,7 +71,7 @@ class IrcConsumer(val cfg: IrcConfig, val indexer: Indexer) extends ListenerAdap
   override def onPrivateMessage(event: PrivateMessageEvent[PircBotX]) {
     val username = event.getUser.getNick()
     val msg = event.getMessage
-    logger.debug("Received private message from %s: %s".format(username, msg))
+    logger.info("Received private message from %s: %s".format(username, msg))
     event.respond("AH AH AH. You didn't say the magic word.")
   }
 

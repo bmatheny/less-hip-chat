@@ -1,29 +1,25 @@
 package controllers
 
+import lhc.indexers.Sort
+import lhc.plugins.IndexPlugin
+
 import play.api._
 import play.api.libs._
 import play.api.libs.json._
 import play.api.mvc._
-import lhc.indexers.Sort
-import lhc.messages.Message
-import lhc.plugins.IndexPlugin
 
 object Application extends Controller {
 
   import play.api.Play.current
 
-  implicit object MessageFormat extends Writes[Message] {
-    def writes(m: Message): JsValue = Json.obj(
-      "uuid" -> m.getUuid,
-      "timestamp" -> m.getTimestamp,
-      "iso8601" -> m.iso8601,
-      "localtime" -> m.localTime,
-      "group" -> m.getGroup,
-      "user" -> m.getUser,
-      "message" -> m.getMessage
-    )
+  def groups = Action {
+    Ok(Json.toJson(IndexPlugin.getGroups(current)))
   }
 
+  def index = Action {
+    Ok(views.html.index(IndexPlugin.getGroups(current), Seq()))
+  }
+ 
   def search(query: Option[String], size: Option[Int], page: Option[Int], sort: Option[String]) = Action { implicit req =>
     val uquery = query.getOrElse("*:*")
     val usize = size.filter(_ <= 500).getOrElse(10)
@@ -39,8 +35,4 @@ object Application extends Controller {
     }
   }
 
-  def index = Action {
-    Ok(views.html.index(IndexPlugin.getGroups(current), Seq()))
-  }
-  
 }

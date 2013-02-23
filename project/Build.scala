@@ -7,8 +7,6 @@ object ApplicationBuild extends Build {
   val appName         = "less-hip-chat"
   val appVersion      = "1.0-SNAPSHOT"
 
-  val camelVersion = "2.10.3"
-
   val appDependencies = Seq(
     "org.pircbotx"      % "pircbotx"    % "1.8",
     "org.apache.solr"   % "solr-core"   % "3.6.1",

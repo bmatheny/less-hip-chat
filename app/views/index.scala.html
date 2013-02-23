@@ -1,13 +1,27 @@
-@(groups: Set[String], results: Seq[lhc.messages.Message])
+@(groups: Set[models.Group], results: Seq[models.Message])
 
 @import java.util.ArrayList
 @import lhc.config.AppConfig
 @import org.apache.solr.common.SolrDocument
 
 @main("Less Hip Chat Configuration") {
-@groups.map { res =>
-@res.toString() <br/>
-}
+<table>
+  <thead>
+    <tr>
+      <th>Indexed Channel</th>
+      <th>Message Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    @groups.map { group =>
+    <tr>
+      <td>@group.name</td>
+      <td>@group.messageCount</td>
+    </tr>
+    }
+  </tbody>
+</table>
+
 <table>
   <thead>
     <tr>
