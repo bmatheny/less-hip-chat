@@ -3,7 +3,7 @@ package lhc.indexers
 import lhc.config.SolrConfig
 import lhc.indexers.solr._
 import lhc.util.DefaultLhcLogger
-import models.{BasicGroup, Group, Message}
+import models.{Group, Message, SortDirection}
 import play.api.Application
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits._
@@ -32,7 +32,7 @@ class SolrIndexer(val cfg: SolrConfig, val app: Application) extends Indexer wit
   )
 
   override def find(
-    query: String, rows: Int = 10, start: Int = 10, sort: Sort = Sort.Desc
+    query: String, rows: Int = 10, start: Int = 10, sort: SortDirection = SortDirection.Desc
   ): Seq[Message] = {
     val sq = SolrIndexer.findQuery(query, rows, start, sort)
     withQueryResponse(sq) { response =>
@@ -49,7 +49,7 @@ class SolrIndexer(val cfg: SolrConfig, val app: Application) extends Indexer wit
         .filter(l => l != null && l.size > 0) // getValues returns null on no results
         .map { fields =>
           fields.asScala.map { f =>
-            BasicGroup(f.getName, f.getCount)
+            Group(f.getName, f.getCount)
           }.toSet[Group]
         }.getOrElse(Set[Group]())
     }.getOrElse(Set[Group]())
@@ -107,10 +107,10 @@ class SolrIndexer(val cfg: SolrConfig, val app: Application) extends Indexer wit
 
 object SolrIndexer {
 
-  def findQuery(q: String, rows: Int, start: Int, sort: Sort): SolrQuery = {
+  def findQuery(q: String, rows: Int, start: Int, sort: SortDirection): SolrQuery = {
     val ssort = sort match {
-      case Sort.Desc => SolrQuery.ORDER.desc
-      case Sort.Asc  => SolrQuery.ORDER.asc
+      case SortDirection.Desc => SolrQuery.ORDER.desc
+      case SortDirection.Asc  => SolrQuery.ORDER.asc
     }
     val query = if (q.contains(":")) q else "message:%s".format(q)
     new SolrQuery()

@@ -1,6 +1,5 @@
 package lhc.indexers.solr
 
-import lhc.messages.BasicMessage
 import lhc.util.DefaultLhcLogger
 import models.Message
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
@@ -28,7 +27,7 @@ object DocumentManager extends DefaultLhcLogger {
       val ukey = key.split("_")(1)
       ukey -> doc.getFirstValue(key).asInstanceOf[String]
     }.toMap[String,String]
-    BasicMessage.createMessage(
+    Message(
       uuid = doc.getFieldValue("uuid").asInstanceOf[String],
       timestamp = doc.getFieldValue("timestamp").asInstanceOf[Date].getTime,
       group = doc.getFieldValue("group").asInstanceOf[String],

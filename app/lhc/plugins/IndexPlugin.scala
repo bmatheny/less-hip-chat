@@ -2,9 +2,9 @@ package lhc.plugins
 
 import lhc.config.AppConfig
 import lhc.consumers.IrcConsumer
-import lhc.indexers.{Indexer, SolrIndexer, Sort}
+import lhc.indexers.{Indexer, SolrIndexer}
 import lhc.util.{DefaultLhcLogger, LhcLogger}
-import models.{Group, Message}
+import models.{Group, Message, SortDirection}
 import play.api.{Application, Plugin}
 import org.pircbotx.PircBotX
 
@@ -25,7 +25,7 @@ class IndexPlugin(app: Application) extends Plugin with LhcLogger {
     consumer = Some(new IrcConsumer(AppConfig.irc, idx))
   }
 
-  def find(query: String, rows: Int = 10, start: Int = 0, sort: Sort = Sort.Desc): Seq[Message] = {
+  def find(query: String, rows: Int = 10, start: Int = 0, sort: SortDirection = SortDirection.Desc): Seq[Message] = {
     indexer.map(_.find(query,rows,start,sort)).getOrElse(Seq())
   }
   def getGroups(): Set[Group] = {
@@ -51,7 +51,7 @@ object IndexPlugin extends DefaultLhcLogger {
     }
   }
 
-  def find(app: Application, query: String, rows: Int = 10, start: Int = 10, sort: Sort = Sort.Desc): Seq[Message] = {
+  def find(app: Application, query: String, rows: Int = 10, start: Int = 10, sort: SortDirection = SortDirection.Desc): Seq[Message] = {
     withPlugin[Seq[Message]](app, Seq()) { indexer =>
       indexer.find(query,rows,start,sort)
     }

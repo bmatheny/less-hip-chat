@@ -1,7 +1,5 @@
 package models
 
-import play.api.libs.json._
-
 import java.text.SimpleDateFormat
 import java.util.{Date, TimeZone}
 import org.joda.time.format.ISODateTimeFormat
@@ -18,6 +16,11 @@ trait Message {
 }
 
 object Message {
+  def apply(
+    uuid: String = "", timestamp: Long = 0L, group: String = "",
+    user: Map[String, String] = Map.empty, message: String = ""
+  ): Message = new MessageImpl(uuid, timestamp, group, user, message)
+
   private val UTC = TimeZone.getTimeZone("UTC")
   // joda time ISODateTimeFormat parser is thread safe
   private val Iso8601Parser = {
@@ -37,15 +40,6 @@ object Message {
     fmt.format(new Date(timestamp))
   }
 
-  implicit object MessageFormat extends Writes[Message] {
-    def writes(m: Message): JsValue = Json.obj(
-      "uuid" -> m.getUuid,
-      "timestamp" -> m.getTimestamp,
-      "iso8601" -> m.iso8601,
-      "localtime" -> m.localTime,
-      "group" -> m.getGroup,
-      "user" -> m.getUser,
-      "message" -> m.getMessage
-    )
-  }
 }
+
+

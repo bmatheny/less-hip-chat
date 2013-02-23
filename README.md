@@ -31,15 +31,15 @@ There is a pretty basic search API that provides JSON and JSONP output.
 
 ### URL
 
-    GET /search
+    GET /api/search
 
 ### Parameters
 
-  * `callback` - string 
-  * `query` - string
-  * `size` - int
-  * `page` - int
-  * `sort` - string - asc or desc - defaults to desc
+  * `callback` - string, optional. for use with jsonp
+  * `query` - string, optional. defaults to `*:*`.
+  * `size` - int, optional. defaults to 10, max 500.
+  * `page` - int, optional. defaults to 0.
+  * `sort` - string, optional. defaults to desc. asc is also valid.
 
 ## Disclaimer
 
