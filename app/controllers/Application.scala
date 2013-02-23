@@ -8,16 +8,25 @@ import play.api.libs._
 import play.api.libs.json._
 import play.api.mvc._
 
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+
 object Application extends Controller {
 
   import play.api.Play.current
   import formats._
 
   def groups = Action { implicit req =>
-    val json = Json.toJson(IndexPlugin.getGroups(current))
-    req.queryString.get("callback").flatMap(_.headOption) match {
-      case Some(callback) => Ok(Jsonp(callback, json))
-      case None => Ok(json)
+    val futureResult = future {
+      Json.toJson(IndexPlugin.getGroups(current))
+    }
+    Async {
+      futureResult.map { json =>
+        req.queryString.get("callback").flatMap(_.headOption) match {
+          case Some(callback) => Ok(Jsonp(callback, json))
+          case None => Ok(json)
+        }
+      }
     }
   }
 
@@ -33,11 +42,17 @@ object Application extends Controller {
         sort.flatMap(SortDirection.withName(_)).getOrElse(SortDirection.Desc)
       )
       val uquery = query.getOrElse("*:*")
-      val results = IndexPlugin.find(current, query.getOrElse("*:*"), params)
-      val json = Json.toJson(results.toJson)
-      req.queryString.get("callback").flatMap(_.headOption) match {
-        case Some(callback) => Ok(Jsonp(callback, json))
-        case None => Ok(json)
+      val futureResult = future {
+        IndexPlugin.find(current, query.getOrElse("*:*"), params)
+      }
+      Async {
+        futureResult.map { r =>
+          val json = Json.toJson(r.toJson)
+          req.queryString.get("callback").flatMap(_.headOption) match {
+            case Some(callback) => Ok(Jsonp(callback, json))
+            case None => Ok(json)
+          }
+        }
       }
     }
 
